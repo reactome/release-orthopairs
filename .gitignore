@@ -1,1 +1,7 @@
+logs/
+target/
+
+# Ignore IntelliJ files
 .idea/
+orthopairs.iml
+
