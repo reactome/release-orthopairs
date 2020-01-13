@@ -1,21 +1,21 @@
 <h2> Orthopairs: Protein ortholog file generation</h2>
 
-To see how to run this script, check out the <a href="https://github.com/reactome/data-release-pipeline/new/feature/orthopairs/orthopairs#-running-orthopairs-">Running Orthopairs</a> section.
+To see how to run this script, check out the <a href="#-running-orthopairs-">Running Orthopairs</a> section.
 
 This step has been rewritten in Java and completely overhauled from the Perl <a href="https://github.com/reactome/Release/tree/master/scripts/release/orthopairs">version</a>.
 
-The overall goal of Orthopairs remains the same: For each of Reactome's model organisms, find all human-model organism protein orthologs. These orthologs are the foundation of the <a href="https://github.com/reactome/data-release-pipeline/tree/develop/orthoinference">Orthoinference</a> step, which produces all electronically inferred ReactionlikeEvents and Pathways in the knowledgebase. 
+The overall goal of Orthopairs remains the same: For each of Reactome's model organisms, find all human-model organism protein orthologs. These orthologs are the foundation of the <a href="https://github.com/reactome/release-orthoinference">Orthoinference</a> step, which produces all electronically inferred ReactionlikeEvents and Pathways in the knowledgebase. 
 
 <h3>Old Orthopairs</h3>
 
 When the script was initially written, getting protein orthologs programmatically wasn't simple. Reactome accomplished it through three steps:
 
-1) From Ensembl Biomart obtain all _protein-gene_ relationships for Human
+1) From Ensembl BioMart obtain all _protein-gene_ relationships for Human
 
 _For each model organism_:<br>
 
-  2. From Ensembl Biomart obtain all _gene-protein_ relationships for the organism
-  - Biomart has become increasingly unstable as Ensembl's focus has moved to their RESTful API. Unfortunately, the information we want is not available through the API.
+  2. From Ensembl BioMart obtain all _gene-protein_ relationships for the organism
+  - BioMart has become increasingly unstable as Ensembl's focus has moved to their RESTful API. Unfortunately, the information we want is not available through the API.
 
   3. From Ensembl Compara, obtain all human-organism gene orthologs
   - While Compara is stable, the process of obtaining the gene orthologs typically took around 24 hours
@@ -42,13 +42,13 @@ There are a few catches with using this new resource though -- Unlike Protein ID
 
 <h3> Running Orthopairs </h3>
 
-Orthopairs can be executed from the bash script <a href="https://github.com/reactome/data-release-pipeline/blob/develop/orthopairs/runOrthopairs.sh">runOrthopairs.sh</a>
+Orthopairs can be executed from the bash script <a href="https://github.com/reactome/release-orthopairs/runOrthopairs.sh">runOrthopairs.sh</a>
 
 Run `bash runOrthopairs.sh`
 
 <h3> Checking Orthopairs output </h3>
 
-There should be 2 files produced for each species in the directory corresponding to the release number. For example, if it was release 70, you would expect to find 2 files corresponding to mmus (Mouse): `70/mmus_gene_protein_mapping.txt` and `70/hsap_mmus_mapping.txt`.
+There should be 2 files produced for each species in the directory corresponding to the release number. For example, if it was release 70, you would expect to find 2 files corresponding to "mmus" (Mouse): `70/mmus_gene_protein_mapping.txt` and `70/hsap_mmus_mapping.txt`.
 
 Compare the line counts of the files to the same ones produced during the previous release. If they are similar, Orthopairs was likely run successfully. 
 
