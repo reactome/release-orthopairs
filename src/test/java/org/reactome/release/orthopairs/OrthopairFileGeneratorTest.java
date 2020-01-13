@@ -1,13 +1,10 @@
 package org.reactome.release.orthopairs;
 
-import java.nio.file.NoSuchFileException;
 import org.json.simple.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -82,7 +79,7 @@ public class OrthopairFileGeneratorTest {
     }
 
     @Test
-    public void createSpeciesGeneProteinFileNullEnsemblIdsTest() throws NoSuchFileException, IOException {
+    public void createSpeciesGeneProteinFileNullEnsemblIdsTest() throws IOException {
         mockSet.add("UniProtKB=F6UIU7");
         mockSet.add("LDO");
         mockMap.put("XB-GENE-973992", mockSet);
