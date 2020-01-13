@@ -1,5 +1,6 @@
 package org.reactome.release.orthopairs;
 
+import java.nio.file.NoSuchFileException;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,11 +34,6 @@ public class OrthopairFileGeneratorTest {
 
     @Mock
     JSONObject mockJSONObject;
-
-//    @Before
-//    public void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//    }
 
     @Test
     public void createProteinHomologyFileTest() throws IOException {
@@ -86,7 +82,7 @@ public class OrthopairFileGeneratorTest {
     }
 
     @Test
-    public void createSpeciesGeneProteinFileNullEnsemblIdsTest() throws IOException {
+    public void createSpeciesGeneProteinFileNullEnsemblIdsTest() throws NoSuchFileException, IOException {
         mockSet.add("UniProtKB=F6UIU7");
         mockSet.add("LDO");
         mockMap.put("XB-GENE-973992", mockSet);
