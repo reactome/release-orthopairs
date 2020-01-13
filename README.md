@@ -42,7 +42,7 @@ There are a few catches with using this new resource though -- Unlike Protein ID
 
 <h3> Running Orthopairs </h3>
 
-Orthopairs can be executed from the bash script <a href="https://github.com/reactome/release-orthopairs/runOrthopairs.sh">runOrthopairs.sh</a>
+Orthopairs can be executed from the bash script <a href="https://github.com/reactome/release-orthopairs/blob/develop/runOrthopairs.sh">runOrthopairs.sh</a>
 
 Run `bash runOrthopairs.sh`
 
