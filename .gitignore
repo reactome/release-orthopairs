@@ -1,6 +1,12 @@
 logs/
 target/
 
+# Ignore PANTHER data files
+GENES_RAT.txt
+GenePageEnsemblModelMapping.txt
+HGNC_homologene.rpt
+ensembl_1_to_1.txt
+
 # Ignore IntelliJ files
 .idea/
 orthopairs.iml
