@@ -26,11 +26,6 @@ public class AlternateIdMapperTest {
     String zebrafishTestFilename = "src/test/resources/drer_alt_id_test.txt";
     String yeastTestFilename = "src/test/resources/scer_alt_id_test.txt";
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
     @Test
     public void mapMouseAlternateIdsTest() throws IOException {
 

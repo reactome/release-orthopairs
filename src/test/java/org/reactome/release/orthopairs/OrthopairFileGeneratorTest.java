@@ -1,12 +1,10 @@
 package org.reactome.release.orthopairs;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -33,11 +31,6 @@ public class OrthopairFileGeneratorTest {
 
     @Mock
     JSONObject mockJSONObject;
-
-//    @Before
-//    public void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//    }
 
     @Test
     public void createProteinHomologyFileTest() throws IOException {
