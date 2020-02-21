@@ -28,7 +28,7 @@ public class UniProtGeneNamesRetriever {
     /**
      * Queries the UniProt mapping service through their Java API library. All Uniprot accession IDs are taken from the Panther
      * homolog files and used to query UniProt for the associated Gene Name. At time of writing (February 2020) this takes about
-     * 2 hours to complete. The end result is a {targetSpecies}_gene_name_mapping.tsv file for each species.
+     * 3 hours to complete. The end result is a {targetSpecies}_gene_name_mapping.tsv file for each species.
      * @param speciesKey String - Shortened version of species name (eg: Bos taurus --> btau).
      * @param releaseNumber String - Used to create a directory where the produced files are stored.
      * @param pantherHomologMappings Map<String, Set<String>> - Species-specific homolog mappings.
@@ -79,14 +79,13 @@ public class UniProtGeneNamesRetriever {
      * @param pantherMappings Map<String, Set<String>> - Species-specific homolog mappings.
      * @return Set<String> - All UniProt identifiers in the mapping object.
      */
-    private static Set<String> getUniProtIdentifiers(Map<String, Set<String>> pantherMappings) {
+    public static Set<String> getUniProtIdentifiers(Map<String, Set<String>> pantherMappings) {
         Set<String> uniprotIds = new HashSet<>();
         for (String uniprotKey : pantherMappings.keySet()) {
-            // The mappings at this point are of the form "UniProtKB=123456", so we isolate the identifier.
-            uniprotIds.add(uniprotKey.split("=")[1]);
             for (String uniprotValue : pantherMappings.get(uniprotKey)) {
                 // Some identifiers aren't UniProt, and therefore can't be queried for Gene Names.
                 if (uniprotValue.contains("UniProtKB")) {
+                    // The values at this point are of the form "UniProtKB=123456", so we isolate the identifier.
                     uniprotIds.add(uniprotValue.split("=")[1]);
                 }
             }
@@ -99,7 +98,7 @@ public class UniProtGeneNamesRetriever {
      * @param uniprotIds Set<String> - All unique UniProt identifiers that were in the Panther mapping.
      * @return List<Set<String>> Partitioned UniProt identifiers.
      */
-    private static List<Set<String>> partitionUniProtIdentifiers(Set<String> uniprotIds) {
+    public static List<Set<String>> partitionUniProtIdentifiers(Set<String> uniprotIds) {
         List<Set<String>> partitionedUniProtIds = new ArrayList<>();
         Set<String> partition = new HashSet<>();
         for (String uniprotId : uniprotIds) {
@@ -122,7 +121,7 @@ public class UniProtGeneNamesRetriever {
      * @throws ServiceException - Thrown by UniProtService class if service is unavailable.
      * @throws InterruptedException - Thrown if the Sleep process that occurs after every batch query is interrupted.
      */
-    private static Set<String> retrieveGeneNamesFromUniProt(List<Set<String>> partitionedUniProtIds) throws ServiceException, InterruptedException {
+    public static Set<String> retrieveGeneNamesFromUniProt(List<Set<String>> partitionedUniProtIds) throws ServiceException, InterruptedException {
 
         // Create the UniProtService.
         ServiceFactory serviceFactoryInstance = Client.getServiceFactoryInstance();
