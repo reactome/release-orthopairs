@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
 import java.util.*;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -18,6 +19,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import uk.ac.ebi.kraken.interfaces.uniprot.Gene;
+import uk.ac.ebi.kraken.interfaces.uniprot.PrimaryUniProtAccession;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.dataservice.client.Client;
+import uk.ac.ebi.uniprot.dataservice.client.QueryResult;
+import uk.ac.ebi.uniprot.dataservice.client.ServiceFactory;
+import uk.ac.ebi.uniprot.dataservice.client.exception.ServiceException;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtComponent;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtData;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtQueryBuilder;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtService;
+import uk.ac.ebi.uniprot.dataservice.query.Query;
 
 public class Main
 {
@@ -42,8 +55,7 @@ public class Main
     private static final Logger logger = LogManager.getLogger();
 
 
-    public static void main( String[] args ) throws IOException, ParseException {
-
+    public static void main( String[] args ) throws IOException, ParseException, ServiceException, InterruptedException {
 
         // If using an alternative source species, specify the 4-letter code as the second argument
         String pathToConfig = args.length > 0 ? args[0] : Paths.get("src", "main", "resources", "config.properties").toString();
@@ -67,7 +79,6 @@ public class Main
             throw new IllegalStateException("No releaseNumber attribute in config.properties");
         }
         new File(releaseNumber).mkdir();
-
         logger.info("Starting Orthopairs file generation");
         // Download and extract homology files from Panther
         List<String> pantherFiles = new ArrayList<String>(Arrays.asList(pantherQfOFilename, pantherHCOPFilename));
@@ -104,22 +115,29 @@ public class Main
         OrthologyFileParser.parsePantherOrthologFiles(pantherFiles, sourceMappingSpecies, speciesJSONFile);
         Map<String,Map<String,Set<String>>> sourceTargetProteinHomologs = OrthologyFileParser.getSourceAndTargetProteinHomologs();
         Map<String,Map<String,Set<String>>> targetGeneProteinMap = OrthologyFileParser.getTargetGeneProteinMap();
-        // Produces the protein homology and species gene-protein files
+
+        // Produces the protein homology, species gene-protein  and gene name mapping files
         for (Object speciesKey : speciesJSONFile.keySet()) {
+
             // No point in the source species mapping to itself
             if (!speciesKey.equals(sourceMappingSpecies)) {
+
                 JSONObject speciesJSON = (JSONObject)speciesJSONFile.get(speciesKey);
                 JSONArray speciesNames = (JSONArray) speciesJSON.get("name");
                 logger.info("Attempting to create orthopairs files for " + speciesNames.get(0));
                 String speciesPantherName = speciesJSON.get("panther_name").toString();
-                // Produces the {sourceSpecies}_{targetspecies}_mapping.txt file
-                String sourceTargetProteinMappingFilename = releaseNumber + "/" + sourceMappingSpecies + "_" + speciesKey + "_mapping.txt";
+                // Produces the {sourceSpecies}_{targetspecies}_mapping.tsv file
+                String sourceTargetProteinMappingFilename = releaseNumber + "/" + sourceMappingSpecies + "_" + speciesKey + "_mapping.tsv";
                 Map<String,Set<String>> speciesProteinHomologs = sourceTargetProteinHomologs.get(speciesPantherName);
                 OrthopairFileGenerator.createProteinHomologyFile(sourceTargetProteinMappingFilename, speciesProteinHomologs);
-                // Produces the {targetSpecies}_gene_protein_mapping.txt file
-                String targetGeneProteinMappingFilename = releaseNumber + "/" + speciesKey + "_gene_protein_mapping.txt";
+                // Produces the {targetSpecies}_gene_protein_mapping.tsv file
+                String targetGeneProteinMappingFilename = releaseNumber + "/" + speciesKey + "_gene_protein_mapping.tsv";
                 Map<String,Set<String>> speciesGeneProteinMap = targetGeneProteinMap.get(speciesPantherName);
                 OrthopairFileGenerator.createSpeciesGeneProteinFile(speciesKey.toString(), targetGeneProteinMappingFilename, speciesJSON, speciesGeneProteinMap);
+                // Queries UniProt API for gene names and creates the {targetSpecies}_gene_name_mapping.tsv file
+                logger.info("Retrieving gene names for " + speciesNames.get(0) + " from UniProt");
+                UniProtGeneNamesRetriever.retrieveAndStoreGeneNameMappings(speciesKey.toString(), releaseNumber, sourceTargetProteinHomologs.get(speciesPantherName));
+
             }
         }
 
