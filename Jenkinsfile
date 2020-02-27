@@ -27,9 +27,7 @@ pipeline{
 		stage('Setup: Build jar file') {
 			steps {
 				script {
-					dir ('orthopairs') {
-							sh "mvn clean compile assembly:single"
-					}
+					sh "mvn clean compile assembly:single"
 				}
 			}
 		}
@@ -37,11 +35,9 @@ pipeline{
 		stage('Main: Generate Orthopairs files') {
 			steps {
 				script {
-					dir ('orthopairs') {
-						// The credentials used here are a config file uploaded to Jenkins.
-						withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
-							sh "java -jar target/orthopairs-${env.ORTHOPAIRS_VERSION}-jar-with-dependencies.jar $ConfigFile"
-						}
+					// The credentials used here are a config file uploaded to Jenkins.
+					withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
+						sh "java -jar target/orthopairs-*-jar-with-dependencies.jar $ConfigFile"
 					}
 				}
 			}
