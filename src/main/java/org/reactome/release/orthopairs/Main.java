@@ -54,7 +54,7 @@ public class Main
 
     private static final Logger logger = LogManager.getLogger();
 
-
+    //TODO: Add Exception commenting
     public static void main( String[] args ) throws IOException, ParseException, ServiceException, InterruptedException {
 
         // If using an alternative source species, specify the 4-letter code as the second argument
@@ -118,7 +118,6 @@ public class Main
 
         // Produces the protein homology, species gene-protein  and gene name mapping files
         for (Object speciesKey : speciesJSONFile.keySet()) {
-
             // No point in the source species mapping to itself
             if (!speciesKey.equals(sourceMappingSpecies)) {
 
@@ -137,7 +136,6 @@ public class Main
                 // Queries UniProt API for gene names and creates the {targetSpecies}_gene_name_mapping.tsv file
                 logger.info("Retrieving gene names for " + speciesNames.get(0) + " from UniProt");
                 UniProtGeneNamesRetriever.retrieveAndStoreGeneNameMappings(speciesKey.toString(), releaseNumber, sourceTargetProteinHomologs.get(speciesPantherName));
-
             }
         }
 
