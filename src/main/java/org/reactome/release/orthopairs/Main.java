@@ -1,16 +1,9 @@
 package org.reactome.release.orthopairs;
 
 import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -40,8 +33,9 @@ public class Main
      */
 
     private static final Logger logger = LogManager.getLogger();
+    private static final String pantherQfOFilename = "QfO_Genome_Orthologs.tar.gz";
+    private static final String pantherHCOPFilename = "Orthologs_HCOP.tar.gz";
 
-    //TODO: Add Exception commenting
     public static void main( String[] args ) throws IOException, ParseException, ServiceException, InterruptedException {
 
         // If using an alternative source species, specify the 4-letter code as the second argument
@@ -50,47 +44,18 @@ public class Main
         Properties props = new Properties();
         props.load(new FileInputStream(pathToConfig));
 
-        // Load all config properties
+        // Load config.properties
         String releaseNumber = props.get("releaseNumber").toString();
         String pathToSpeciesConfig = props.get("pathToSpeciesConfig").toString();
-        String pantherFilepath = props.get("pantherCurrentFileFolderURL").toString();
-        String pantherQfOFilename = props.get("pantherQfOFilename").toString();
-        String pantherHCOPFilename = props.get("pantherHCOPFilename").toString();
-        String MGIFileURL = props.get("MGIFileURL").toString();
-        String RGDFileURL = props.get("RGDFileURL").toString();
-        String XenbaseFileURL = props.get("XenbaseFileURL").toString();
-        String ZFINFileURL = props.get("ZFINFileURL").toString();
 
         if (releaseNumber.isEmpty()) {
             logger.fatal("Please populate config.properties file with releaseNumber");
             throw new IllegalStateException("No releaseNumber attribute in config.properties");
         }
         new File(releaseNumber).mkdir();
-        logger.info("Starting Orthopairs file generation");
-        // Download and extract homology files from Panther
-        List<String> pantherFiles = new ArrayList<String>(Arrays.asList(pantherQfOFilename, pantherHCOPFilename));
-        for (String pantherFilename : pantherFiles) {
-            downloadAndExtractTarFile(pantherFilename, pantherFilepath);
-        }
-        // QfO_Genome_Orthologs.tar.gz extracts a file named 'QfO_Genome_Orthologs_pairwise', which is unexpected.
-        // This just prunes the '_pairwise' string from the filename.
-        Path extractedPantherQfOFilePath = Paths.get(pantherQfOFilename.replace(".tar.gz", ""));
-        if (!Files.exists(extractedPantherQfOFilePath)) {
-            Files.move(Paths.get(extractedPantherQfOFilePath + "_pairwise"), extractedPantherQfOFilePath);
-        }
 
-        // Download ID files from various model organism databases (Mouse Genome Informatics, Rat Genome Database, Xenbase (frog), ZFIN (Zebrafish))
-        // HGNC identifier file is downloaded as well.
-        List<String> alternativeIdMappingURLs = new ArrayList<>(Arrays.asList(MGIFileURL,RGDFileURL,XenbaseFileURL,ZFINFileURL));
-        for (String altIdURL : alternativeIdMappingURLs) {
-            File altIdFilepath = Paths.get(altIdURL).getFileName().toFile();
-            if (!altIdFilepath.exists()) {
-                logger.info("Downloading " + altIdURL);
-                FileUtils.copyURLToFile(new URL(altIdURL), altIdFilepath);
-            } else {
-                logger.info(altIdFilepath + " already exists");
-            }
-        }
+        logger.info("Starting Orthopairs file generation");
+        List<String> pantherFiles = new ArrayList<String>(Arrays.asList(pantherQfOFilename, pantherHCOPFilename));
 
         JSONParser parser = new JSONParser();
         JSONObject speciesJSONFile = (JSONObject) parser.parse(new FileReader(pathToSpeciesConfig));
@@ -126,39 +91,5 @@ public class Main
             }
         }
         logger.info("Finished Orthopairs file generation");
-    }
-
-    private static void downloadAndExtractTarFile(String pantherFilename, String pantherFilepath) throws IOException {
-
-        URL pantherFileURL = new URL(pantherFilepath + pantherFilename);
-        File pantherTarFile = new File(pantherFilename);
-
-        // Download files
-        if (!pantherTarFile.exists()) {
-            logger.info("Downloading " + pantherFileURL);
-            FileUtils.copyURLToFile(pantherFileURL, new File(pantherFilename));
-        } else {
-            logger.info(pantherTarFile + " already exists");
-        }
-
-        // Extract tar files
-        File extractedPantherFile = new File(pantherFilename.replace(".tar.gz", ""));
-        if (!extractedPantherFile.exists()) {
-            logger.info("Extracting " + pantherTarFile);
-            TarArchiveInputStream tarIn = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(pantherTarFile)));
-            TarArchiveEntry tarFile;
-            while ((tarFile = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-                int count;
-                byte data[] = new byte[1024];
-                FileOutputStream fos = new FileOutputStream(tarFile.getName(), false);
-                try (BufferedOutputStream dest = new BufferedOutputStream(fos, 1024)) {
-                    while ((count = tarIn.read(data, 0, 1024)) != -1) {
-                        dest.write(data, 0, count);
-                    }
-                }
-            }
-        } else {
-            logger.info(pantherTarFile + " has already been extracted");
-        }
     }
 }

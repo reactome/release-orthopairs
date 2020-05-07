@@ -78,7 +78,7 @@
 		"group":"Fungi/Plants",
 		"compara":"core",
 		"panther_name":"YEAST",
-		"alt_id_file": "src/main/resources/sgd_ids.txt"
+		"alt_id_file": "src/main/resources/scer_alternate_ids.txt"
 	},
 	"sscr":{
 		"group":"Vertebrate",
@@ -154,7 +154,7 @@
 		"group":"Vertebrate",
 		"compara":"core",
 		"panther_name":"XENTR",
-		"alt_id_file": "GenePageEnsemblModelMapping.txt"
+		"alt_id_file": "xtro_alternate_ids.txt"
 	},
 	"spom":{
 		"group":"Fungi/Plants",
@@ -220,7 +220,7 @@
 		"compara":"core",
 		"group":"Vertebrate",
 		"panther_name":"MOUSE",
-		"alt_id_file": "HGNC_homologene.rpt"
+		"alt_id_file": "mmus_alternate_ids.txt"
 	},
 	"cfam":{
 		"compara":"core",
@@ -312,7 +312,7 @@
 		"group":"Vertebrate",
 		"compara":"core",
 		"panther_name":"DANRE",
-		"alt_id_file": "ensembl_1_to_1.txt"
+		"alt_id_file": "drer_alternate_ids.txt"
 	},
 	"rnor":{
 		"compara":"core",
@@ -332,6 +332,6 @@
 			"Rattus norvegicus"
 		],
 		"panther_name":"RAT",
-		"alt_id_file":"GENES_RAT.txt"
+		"alt_id_file":"rnor_alternate_ids.txt"
 	}
 }
