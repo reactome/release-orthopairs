@@ -25,6 +25,26 @@ pipeline{
 				}
 			}
 		}
+		stage('Setup: Download Ortholog files from PANTHER'){
+			steps{
+				script{
+					sh "wget ftp://ftp.pantherdb.org/ortholog/current_release/Orthologs_HCOP.tar.gz"
+					sh "tar -xvf Orthologs_HCOP.tar.gz"
+					sh "wget ftp://ftp.pantherdb.org/ortholog/current_release/QfO_Genome_Orthologs.tar.gz"
+					sh "tar -xvf QfO_Genome_Orthologs.tar.gz"
+				}
+			}
+		}
+		stage('Setup: Download alternate ID mapping files'){
+			steps{
+				script{
+					sh "wget -O mmus_alternate_ids.txt http://www.informatics.jax.org/downloads/reports/HGNC_homologene.rpt"
+					sh "wget -O rnor_alternate_ids.txt ftp://ftp.rgd.mcw.edu/pub/data_release/GENES_RAT.txt"
+					sh "wget -O xtro_alternate_ids.txt ftp://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt"
+					sh "wget -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt"
+				}
+			}
+		}			
 		// This stage builds the jar file using maven.
 		stage('Setup: Build jar file') {
 			steps {
@@ -51,8 +71,7 @@ pipeline{
 				script{
 					def s3Path = "${env.S3_RELEASE_DIRECTORY_URL}/${currentRelease}/orthopairs"
 					sh "mkdir -p data/orthopairs/"
-					sh "mv *.txt data/"
-					sh "mv HGNC_homologene.rpt data/"
+					sh "mv *alternate_ids.txt data/"
 					sh "mv ${currentRelease}/* data/orthopairs/"
 					sh "mv *.gz data/"
 					sh "gzip -r logs/ data/"
