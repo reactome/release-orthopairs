@@ -38,6 +38,6 @@ echo "java -jar $orthopairs_jar_file"
 java -jar $orthopairs_jar_file
 
 echo "Removing large files..."
-rm Orthologs_HCOP* QfO_Genome_Orthologs*
+rm *Orthologs*_HCOP*
 
 echo "Finished Orthopairs"
