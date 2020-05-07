@@ -11,7 +11,7 @@ pipeline{
 		stage('Check ConfirmReleaseConfig build succeeded'){
 			steps{
 				script{
-					def currentRelease = (pwd() =~ /Releases\/(\d+)\//)[0][1];
+					def currentRelease = (pwd() =~ /(\d+)\//)[0][1];
 					// This queries the Jenkins API to confirm that the most recent build of 'ConfirmReleaseConfigs' was successful.
 					def configStatusUrl = httpRequest authentication: 'jenkinsKey', validResponseCodes: "${env.VALID_RESPONSE_CODES}", url: "${env.JENKINS_JOB_URL}/job/$currentRelease/job/ConfirmReleaseConfigs/lastBuild/api/json"
 					if (configStatusUrl.getStatus() == 404) {
