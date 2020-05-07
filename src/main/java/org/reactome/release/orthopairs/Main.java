@@ -5,8 +5,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Duration;
 import java.util.*;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -19,18 +17,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import uk.ac.ebi.kraken.interfaces.uniprot.Gene;
-import uk.ac.ebi.kraken.interfaces.uniprot.PrimaryUniProtAccession;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.dataservice.client.Client;
-import uk.ac.ebi.uniprot.dataservice.client.QueryResult;
-import uk.ac.ebi.uniprot.dataservice.client.ServiceFactory;
 import uk.ac.ebi.uniprot.dataservice.client.exception.ServiceException;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtComponent;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtData;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtQueryBuilder;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtService;
-import uk.ac.ebi.uniprot.dataservice.query.Query;
 
 public class Main
 {
@@ -138,8 +125,6 @@ public class Main
                 UniProtGeneNamesRetriever.retrieveAndStoreGeneNameMappings(speciesKey.toString(), releaseNumber, sourceTargetProteinHomologs.get(speciesPantherName));
             }
         }
-
-        removePantherFiles(pantherFiles);
         logger.info("Finished Orthopairs file generation");
     }
 
@@ -174,14 +159,6 @@ public class Main
             }
         } else {
             logger.info(pantherTarFile + " has already been extracted");
-        }
-    }
-
-    private static void removePantherFiles(List<String> pantherFiles) {
-        for (String pantherFile : pantherFiles) {
-            String unzippedPantherFile = pantherFile.replace(".tar.gz", "");
-            new File(pantherFile).delete();
-            new File(unzippedPantherFile).delete();
         }
     }
 }
