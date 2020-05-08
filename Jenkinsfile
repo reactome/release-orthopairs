@@ -12,7 +12,7 @@ pipeline{
 		stage('Check ConfirmReleaseConfig build succeeded'){
 			steps{
 				script{
-					currentRelease = (pwd() =~ /Releases\/(\d+)\//)[0][1];
+					currentRelease = (pwd() =~ /(\d+)\//)[0][1];
 					// This queries the Jenkins API to confirm that the most recent build of 'ConfirmReleaseConfigs' was successful.
 					def configStatusUrl = httpRequest authentication: 'jenkinsKey', validResponseCodes: "${env.VALID_RESPONSE_CODES}", url: "${env.JENKINS_JOB_URL}/job/$currentRelease/job/ConfirmReleaseConfigs/lastBuild/api/json"
 					if (configStatusUrl.getStatus() == 404) {
@@ -30,10 +30,12 @@ pipeline{
 		stage('Setup: Download Ortholog files from PANTHER'){
 			steps{
 				script{
-					sh "wget -q ftp://ftp.pantherdb.org/ortholog/current_release/Orthologs_HCOP.tar.gz"
-					sh "tar -xvf Orthologs_HCOP.tar.gz"
-					sh "wget -q ftp://ftp.pantherdb.org/ortholog/current_release/QfO_Genome_Orthologs.tar.gz"
-					sh "tar -xvf QfO_Genome_Orthologs.tar.gz"
+					def hcopFilename = "Orthologs_HCOP.tar.gz";
+					def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
+					sh "wget -q ftp://ftp.pantherdb.org/ortholog/current_release/${hcopFilename}"
+					sh "tar -xvf ${hcopFilename}"
+					sh "wget -q ftp://ftp.pantherdb.org/ortholog/current_release/${qfoFilename}"
+					sh "tar -xvf ${qfoFilename}"
 				}
 			}
 		}
@@ -76,8 +78,8 @@ pipeline{
 					sh "mkdir -p data/orthopairs/"
 					sh "mv *alternate_ids.txt data/"
 					sh "mv ${currentRelease}/* data/orthopairs/"
-					sh "mv *.gz data/"
 					sh "gzip -r logs/ data/"
+					sh "mv *.gz data/"
 					sh "aws s3 --no-progress --recursive cp logs/ $s3Path/logs/"
 					sh "aws s3 --no-progress --recursive cp data/ $s3Path/data/"
 					sh "rm -r ${currentRelease} logs data"
