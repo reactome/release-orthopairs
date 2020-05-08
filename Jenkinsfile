@@ -12,7 +12,7 @@ pipeline{
 		stage('Check ConfirmReleaseConfig build succeeded'){
 			steps{
 				script{
-					currentRelease = (pwd() =~ /Releases\/(\d+)\//)[0][1];
+					currentRelease = (pwd() =~ /(\d+)\//)[0][1];
 					// This queries the Jenkins API to confirm that the most recent build of 'ConfirmReleaseConfigs' was successful.
 					def configStatusUrl = httpRequest authentication: 'jenkinsKey', validResponseCodes: "${env.VALID_RESPONSE_CODES}", url: "${env.JENKINS_JOB_URL}/job/$currentRelease/job/ConfirmReleaseConfigs/lastBuild/api/json"
 					if (configStatusUrl.getStatus() == 404) {
@@ -32,9 +32,10 @@ pipeline{
 				script{
 					def hcopFilename = "Orthologs_HCOP.tar.gz";
 					def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
-					sh "wget -q ftp://ftp.pantherdb.org/ortholog/current_release/${hcopFilename}"
+					def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
+					sh "wget -q ${pantherReleaseURL}/${hcopFilename}"
 					sh "tar -xvf ${hcopFilename}"
-					sh "wget -q ftp://ftp.pantherdb.org/ortholog/current_release/${qfoFilename}"
+					sh "wget -q ${pantherReleaseURL}/${qfoFilename}"
 					sh "tar -xvf ${qfoFilename}"
 				}
 			}
