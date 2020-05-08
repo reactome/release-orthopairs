@@ -33,8 +33,6 @@ public class Main
      */
 
     private static final Logger logger = LogManager.getLogger();
-    private static final String pantherQfOFilename = "QfO_Genome_Orthologs.tar.gz";
-    private static final String pantherHCOPFilename = "Orthologs_HCOP.tar.gz";
 
     public static void main( String[] args ) throws IOException, ParseException, ServiceException, InterruptedException {
 
@@ -45,8 +43,10 @@ public class Main
         props.load(new FileInputStream(pathToConfig));
 
         // Load config.properties
-        String releaseNumber = props.get("releaseNumber").toString();
-        String pathToSpeciesConfig = props.get("pathToSpeciesConfig").toString();
+        String releaseNumber = props.getProperty("releaseNumber");
+        String pathToSpeciesConfig = props.getProperty("pathToSpeciesConfig");
+        String pantherQfOFilename = props.getProperty("pantherQfOFilename");
+        String pantherHCOPFilename = props.getProperty("pantherHCOPFilename");
 
         if (releaseNumber.isEmpty()) {
             logger.fatal("Please populate config.properties file with releaseNumber");
