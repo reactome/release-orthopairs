@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.Duration;
 import java.util.*;
 
 public class UniProtGeneNamesRetriever {
@@ -148,12 +147,9 @@ public class UniProtGeneNamesRetriever {
                 }
 
                 if (count % 1000 == 0) {
-                    logger.info(count + " UniProt identifiers have been processed");
+                    logger.info(count + " UniProt identifiers have been queried for gene names");
                 }
             }
-            // UniProt has a 200 requests/second limit for their API. Chances are we don't need this restriction, but its polite!
-            final long QUERY_SLEEP_DURATION = Duration.ofSeconds(2).toMillis();
-            Thread.sleep(QUERY_SLEEP_DURATION);
         }
         uniprotService.stop();
 
