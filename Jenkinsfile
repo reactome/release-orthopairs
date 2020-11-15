@@ -90,7 +90,8 @@ pipeline{
 					sh "mv ${releaseVersion}/* orthopairs/"
 					def dataFiles = ["orthopairs", "*alternate_ids.txt", "*.gz"]
 					def logFiles = []
-					utils.cleanUpAndArchiveBuildFiles("orthopairs", dataFiles, logFiles)
+					def foldersToDelete = []
+					utils.cleanUpAndArchiveBuildFiles("orthopairs", dataFiles, logFiles, foldersToDelete)
 					sh "rm *Orthologs*"
 				}
 			}
