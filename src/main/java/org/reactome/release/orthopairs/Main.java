@@ -44,9 +44,9 @@ public class Main
 
         // Load config.properties
         String releaseNumber = props.getProperty("releaseNumber");
-        String pathToSpeciesConfig = props.getProperty("pathToSpeciesConfig");
-        String pantherQfOFilename = props.getProperty("pantherQfOFilename");
-        String pantherHCOPFilename = props.getProperty("pantherHCOPFilename");
+        String pathToSpeciesConfig = props.getProperty("pathToSpeciesConfig", "src/main/resources/Species.json");
+        String pantherQfOFilename = props.getProperty("pantherQfOFilename", "QfO_Genome_Orthologs.tar.gz");
+        String pantherHCOPFilename = props.getProperty("pantherHCOPFilename", "Orthologs_HCOP.tar.gz");
 
         if (releaseNumber.isEmpty()) {
             logger.fatal("Please populate config.properties file with releaseNumber");
