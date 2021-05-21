@@ -47,7 +47,7 @@ public class Main
         String pathToSpeciesConfig = props.getProperty("pathToSpeciesConfig", "src/main/resources/Species.json");
         String pantherQfOFilename = props.getProperty("pantherQfOFilename", "QfO_Genome_Orthologs.tar.gz");
         String pantherHCOPFilename = props.getProperty("pantherHCOPFilename", "Orthologs_HCOP.tar.gz");
-
+//        String uniprotQueryBatchSize = props.getProperty("uniprotQueryBatchSize", "100");
         if (releaseNumber.isEmpty()) {
             logger.fatal("Please populate config.properties file with releaseNumber");
             throw new IllegalStateException("No releaseNumber attribute in config.properties");
