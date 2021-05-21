@@ -133,60 +133,60 @@ public class UniProtGeneNamesRetriever {
         int count = 0;
         Set<String> uniprotAccessionsToGeneNames = new HashSet<>();
         for (Set<String> uniprotIdentifierPartition : partitionedUniProtIds) {
-        	int currentAttemptNum = 0;
+            int currentAttemptNum = 0;
             // Build UniProt API query from Set of 250 UniProt identifiers.
             Query query = UniProtQueryBuilder.accessions(uniprotIdentifierPartition);
             // Perform UniProt API query to retrieve gene names associated with identifiers.
             QueryResult<UniProtComponent<Gene>> uniprotEntries = null;
-        	while (currentAttemptNum < MAX_NUM_ATTEMPTS && uniprotEntries == null)
-        	{
+            while (currentAttemptNum < MAX_NUM_ATTEMPTS && uniprotEntries == null)
+            {
                 try
                 {
-                	currentAttemptNum++;
-	            	uniprotEntries = uniprotService.getGenes(query);
-	            	while (uniprotEntries.hasNext()) {
-	                    count++;
-	                    // Get Gene object returned from UniProt.
-	                    UniProtComponent<Gene> geneObject = uniprotEntries.next();
-	                    if (!geneObject.getComponent().isEmpty()) {
-	                        // Iterate through all Gene components in the response.
-	                        for (Gene geneComponent : geneObject.getComponent()) {
-	                            // Tab-separate UniProt accession ID and its associated gene name, and then store these in the Set that will be returned.
-	                            uniprotAccessionsToGeneNames.add(geneObject.getAccession().toString() + "\t" + geneComponent.getGeneName().toString() + "\n");
-	                        }
-	                    }
+                    currentAttemptNum++;
+                    uniprotEntries = uniprotService.getGenes(query);
+                    while (uniprotEntries.hasNext()) {
+                        count++;
+                        // Get Gene object returned from UniProt.
+                        UniProtComponent<Gene> geneObject = uniprotEntries.next();
+                        if (!geneObject.getComponent().isEmpty()) {
+                            // Iterate through all Gene components in the response.
+                            for (Gene geneComponent : geneObject.getComponent()) {
+                                // Tab-separate UniProt accession ID and its associated gene name, and then store these in the Set that will be returned.
+                                uniprotAccessionsToGeneNames.add(geneObject.getAccession().toString() + "\t" + geneComponent.getGeneName().toString() + "\n");
+                            }
+                        }
 
-	                    if (count % 1000 == 0) {
-	                        logger.info(count + " UniProt identifiers have been queried for gene names");
-	                    }
-	                }
+                        if (count % 1000 == 0) {
+                            logger.info(count + " UniProt identifiers have been queried for gene names");
+                        }
+                    }
                 }
-            	catch (ServiceException e)
+                catch (ServiceException e)
                 {
-                	// Log the exception right away, just in case any code in the exception handler fails and we don't get a chance to log it later.
-                	logger.error(e);
-                	// If the exception was caused by a Timeout, then we want to retry.
-                	boolean timeoutFound = false;
-                	int i = 0;
-                	while (!timeoutFound && i < e.getStackTrace().length)
-                	{
-                		// don't be too specific - there are other classes for timeouts. ANY type timeout should trigger a wait-retry.
-                		timeoutFound = e.getStackTrace()[i].getClassName().toUpperCase().contains("TIMEOUT");
-                		i++;
-                	}
-                 	// If a timeout was found, sleep for a bit and then retry.
-            	if (timeoutFound)
-	           	{
-	           		long sleepAmt = Duration.ofSeconds(currentAttemptNum * 2L).toMillis();
-	             		logger.warn("A timeout exception was caught while trying to connect to the UniProt service after {} attempts. A retry will be performed after {} milliseconds", currentAttemptNum, sleepAmt);
-	             		Thread.sleep(sleepAmt);
-	             	}
-	             	else
-	             	{
-	             		logger.error("ServiceException caught while trying to communicate with UniProt: " + e.getMessage(), e);
-	             	}
-	            }
-        	}
+                    // Log the exception right away, just in case any code in the exception handler fails and we don't get a chance to log it later.
+                    logger.error(e);
+                    // If the exception was caused by a Timeout, then we want to retry.
+                    boolean timeoutFound = false;
+                    int i = 0;
+                    while (!timeoutFound && i < e.getStackTrace().length)
+                    {
+                        // don't be too specific - there are other classes for timeouts. ANY type timeout should trigger a wait-retry.
+                        timeoutFound = e.getStackTrace()[i].getClassName().toUpperCase().contains("TIMEOUT");
+                        i++;
+                    }
+                    // If a timeout was found, sleep for a bit and then retry.
+                    if (timeoutFound)
+                    {
+                        long sleepAmt = Duration.ofSeconds(currentAttemptNum * 2L).toMillis();
+                        logger.warn("A timeout exception was caught while trying to connect to the UniProt service after {} attempts. A retry will be performed after {} milliseconds", currentAttemptNum, sleepAmt);
+                        Thread.sleep(sleepAmt);
+                    }
+                    else
+                    {
+                        logger.error("ServiceException caught while trying to communicate with UniProt: " + e.getMessage(), e);
+                    }
+                }
+            }
         }
         uniprotService.stop();
 
