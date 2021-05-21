@@ -83,10 +83,16 @@
 			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Be aware that the UniProt japi dependency
+		will include google's guice 4.0
+		which does not play nicely with Java 9+.
+		I have not found a way to resolve this yet
+		other than running this code in a Java 8 docker
+		container. -->
 		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>
 			<artifactId>japi</artifactId>
-			<version>1.0.31</version>
+			<version>1.0.38</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -94,7 +100,6 @@
 			<version>2.1</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<repositories>
