@@ -147,7 +147,7 @@ public class UniProtGeneNamesRetriever {
                     }
 
                     UniProtComponent<Gene> geneObject = uniprotEntriesResultPage.getResult(resultCount);
-                    System.out.println(geneObject.getAccession() + ", Result: " + resultCount + ", Count: " + count);
+                    //System.out.println(geneObject.getAccession() + ", Result: " + resultCount + ", Count: " + count);
 
                     resultCount += 1;
                     count += 1;
