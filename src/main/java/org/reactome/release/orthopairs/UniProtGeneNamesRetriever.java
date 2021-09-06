@@ -55,6 +55,7 @@ public class UniProtGeneNamesRetriever {
     private static Set<String> retrieveGeneNameMappings(Map<String, Set<String>> pantherMappings) throws ServiceException, InterruptedException {
         // Get all UniProt identifiers and organize them into a List of Sets that contain 250 UniProt identifiers each.
         List<Set<String>> partitionedUniProtIds = getPartitionedUniProtIdentifiers(pantherMappings);
+        //System.out.println(partitionedUniProtIds);
         // Query UniProt for gene names associated with UniProt identifiers.
         return retrieveGeneNamesFromUniProt(partitionedUniProtIds);
 
@@ -102,6 +103,7 @@ public class UniProtGeneNamesRetriever {
         List<Set<String>> partitionedUniProtIds = new ArrayList<>();
         Set<String> partition = new HashSet<>();
         for (String uniprotId : uniprotIds) {
+            // System.out.println(uniprotId);
             partition.add(uniprotId);
             // Once the partition has 250 identifiers, add it to the List and reset the partition variable.
             if (partition.size() == MAX_UNIPROT_BATCH_QUERY_SIZE) {
@@ -126,7 +128,6 @@ public class UniProtGeneNamesRetriever {
         ServiceFactory serviceFactoryInstance = Client.getServiceFactoryInstance();
         UniProtService uniprotService = serviceFactoryInstance.getUniProtQueryService();
         uniprotService.start();
-        int count = 0;
         Set<String> uniprotAccessionsToGeneNames = new HashSet<>();
         for (Set<String> uniprotIdentifierPartition : partitionedUniProtIds) {
             // Build UniProt API query from Set of 250 UniProt identifiers.
@@ -135,22 +136,34 @@ public class UniProtGeneNamesRetriever {
             // Perform UniProt API query to retrieve gene names associated with identifiers.
             QueryResult<UniProtComponent<Gene>> uniprotEntries = uniprotService.getGenes(query);
 
+            //System.out.println("Number of hits: " + uniprotEntries.getNumberOfHits());
             QueryResultPage<UniProtComponent<Gene>> uniprotEntriesResultPage = uniprotEntries.getCurrentPage();
-            int resultCount = 0;
-            while (uniprotEntriesResultPage != null) {
+            int pageCount = 0;
+            int totalHitCount = 0;
+            while (totalHitCount < uniprotEntries.getNumberOfHits()) {
                 //System.out.println(uniprotEntriesResultPage.pageSize());
-                while (uniprotEntriesResultPage.pageSize() > resultCount) {
-                    if (count == 3409 || count == 3489 || count == 17775) {
-                        resultCount += 1;
-                        count += 1;
+                while (pageCount < uniprotEntriesResultPage.pageSize()) {
+//                    if (count == 3409 || count == 3489 || count == 17775) {
+//                        resultCount += 1;
+//                        count += 1;
+//                        continue;
+//                    }
+                    //System.out.println(totalHitCount);
+
+                    UniProtComponent<Gene> geneObject;
+                    try {
+                        geneObject = uniprotEntriesResultPage.getResult(pageCount);
+                        // System.out.println(geneObject.getAccession());
+                    } catch (Exception e) {
+                        pageCount += 1;
+                        totalHitCount += 1;
                         continue;
                     }
 
-                    UniProtComponent<Gene> geneObject = uniprotEntriesResultPage.getResult(resultCount);
                     //System.out.println(geneObject.getAccession() + ", Result: " + resultCount + ", Count: " + count);
 
-                    resultCount += 1;
-                    count += 1;
+                    pageCount += 1;
+                    totalHitCount += 1;
 
                     //System.out.println(count);
                     //System.out.println(geneObject.getAccession());
@@ -163,12 +176,13 @@ public class UniProtGeneNamesRetriever {
                     }
 
 
-                    if (count % 1000 == 0) {
-                        logger.info(count + " UniProt identifiers have been queried for gene names");
+                    if (totalHitCount % 1000 == 0) {
+                        logger.info(totalHitCount + " UniProt identifiers have been queried for gene names");
                     }
                 }
                 uniprotEntriesResultPage = uniprotEntriesResultPage.fetchNextPage();
-                resultCount = 0;
+                //System.out.println("Page size: " + uniprotEntriesResultPage.pageSize());
+                pageCount = 0;
             }
 
 //            final AtomicInteger count1 = new AtomicInteger(0);
