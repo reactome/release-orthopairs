@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import uk.ac.ebi.kraken.interfaces.uniprot.Gene;
 import uk.ac.ebi.uniprot.dataservice.client.Client;
 import uk.ac.ebi.uniprot.dataservice.client.QueryResult;
+import uk.ac.ebi.uniprot.dataservice.client.QueryResultPage;
 import uk.ac.ebi.uniprot.dataservice.client.ServiceFactory;
 import uk.ac.ebi.uniprot.dataservice.client.exception.ServiceException;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtComponent;
@@ -121,7 +122,6 @@ public class UniProtGeneNamesRetriever {
      * @throws InterruptedException - Thrown if the Sleep process that occurs after every batch query is interrupted.
      */
     public static Set<String> retrieveGeneNamesFromUniProt(List<Set<String>> partitionedUniProtIds) throws ServiceException, InterruptedException {
-
         // Create the UniProtService.
         ServiceFactory serviceFactoryInstance = Client.getServiceFactoryInstance();
         UniProtService uniprotService = serviceFactoryInstance.getUniProtQueryService();
@@ -130,26 +130,102 @@ public class UniProtGeneNamesRetriever {
         Set<String> uniprotAccessionsToGeneNames = new HashSet<>();
         for (Set<String> uniprotIdentifierPartition : partitionedUniProtIds) {
             // Build UniProt API query from Set of 250 UniProt identifiers.
+            //System.out.println(uniprotAccessionsToGeneNames);
             Query query = UniProtQueryBuilder.accessions(uniprotIdentifierPartition);
             // Perform UniProt API query to retrieve gene names associated with identifiers.
             QueryResult<UniProtComponent<Gene>> uniprotEntries = uniprotService.getGenes(query);
 
+            QueryResultPage<UniProtComponent<Gene>> uniprotEntriesResultPage = uniprotEntries.getCurrentPage();
+            int resultCount = 0;
+            while (uniprotEntriesResultPage != null) {
+                //System.out.println(uniprotEntriesResultPage.pageSize());
+                while (uniprotEntriesResultPage.pageSize() > resultCount) {
+                    if (count == 3409 || count == 3489 || count == 17775) {
+                        resultCount += 1;
+                        count += 1;
+                        continue;
+                    }
+
+                    UniProtComponent<Gene> geneObject = uniprotEntriesResultPage.getResult(resultCount);
+                    System.out.println(geneObject.getAccession() + ", Result: " + resultCount + ", Count: " + count);
+
+                    resultCount += 1;
+                    count += 1;
+
+                    //System.out.println(count);
+                    //System.out.println(geneObject.getAccession());
+                    if (!geneObject.getComponent().isEmpty()) {
+                        // Iterate through all Gene components in the response.
+                        for (Gene geneComponent : geneObject.getComponent()) {
+                            // Tab-separate UniProt accession ID and its associated gene name, and then store these in the Set that will be returned.
+                            uniprotAccessionsToGeneNames.add(geneObject.getAccession().toString() + "\t" + geneComponent.getGeneName().toString() + "\n");
+                        }
+                    }
+
+
+                    if (count % 1000 == 0) {
+                        logger.info(count + " UniProt identifiers have been queried for gene names");
+                    }
+                }
+                uniprotEntriesResultPage = uniprotEntriesResultPage.fetchNextPage();
+                resultCount = 0;
+            }
+
+//            final AtomicInteger count1 = new AtomicInteger(0);
+//uniprotEntries.forEachRemaining(geneObject -> {
+//        count1.getAndIncrement();
+//        System.out.println(geneObject.getAccession());
+//        if (count1.get() % 1000 == 0) {
+//            logger.info(count1.get() + " UniProt identifiers have been queried for gene names");
+//        }
+//    }
+//);
+//            List<UniProtComponent<Gene>> uniprotEntryList = IteratorUtils.toList(uniprotEntries);
+//            for (UniProtComponent<Gene> uniprotEntry : uniprotEntryList) {
+//                count++;
+//                if (!uniprotEntry.getComponent().isEmpty()) {
+//                    // Iterate through all Gene components in the response.
+//                    for (Gene geneComponent : uniprotEntry.getComponent()) {
+//                        // Tab-separate UniProt accession ID and its associated gene name, and then store these in the Set that will be returned.
+//                        uniprotAccessionsToGeneNames.add(uniprotEntry.getAccession().toString() + "\t" + geneComponent.getGeneName().toString() + "\n");
+//                    }
+//
+//
+//                }
+//
+//                if (count % 1000 == 0) {
+//                    logger.info(count + " UniProt identifiers have been queried for gene names");
+//                }
+//
+//            }
+
+
+            /*
             while (uniprotEntries.hasNext()) {
                 count++;
                 // Get Gene object returned from UniProt.
-                UniProtComponent<Gene> geneObject = uniprotEntries.next();
-                if (!geneObject.getComponent().isEmpty()) {
-                    // Iterate through all Gene components in the response.
-                    for (Gene geneComponent : geneObject.getComponent()) {
-                        // Tab-separate UniProt accession ID and its associated gene name, and then store these in the Set that will be returned.
-                        uniprotAccessionsToGeneNames.add(geneObject.getAccession().toString() + "\t" + geneComponent.getGeneName().toString() + "\n");
+                try {
+                    UniProtComponent<Gene> geneObject = uniprotEntries.next();
+                    System.out.println(count);
+                    System.out.println(geneObject.getAccession());
+                    if (!geneObject.getComponent().isEmpty()) {
+                        // Iterate through all Gene components in the response.
+                        for (Gene geneComponent : geneObject.getComponent()) {
+                            // Tab-separate UniProt accession ID and its associated gene name, and then store these in the Set that will be returned.
+                            uniprotAccessionsToGeneNames.add(geneObject.getAccession().toString() + "\t" + geneComponent.getGeneName().toString() + "\n");
+                        }
                     }
+                } catch (Exception e) {
+                    logger.error("Unable to get uniprot entry " + count);
+                    uniprotEntries.next();
+                    //System.exit(1);
                 }
 
                 if (count % 1000 == 0) {
                     logger.info(count + " UniProt identifiers have been queried for gene names");
                 }
             }
+            */
         }
         uniprotService.stop();
 
