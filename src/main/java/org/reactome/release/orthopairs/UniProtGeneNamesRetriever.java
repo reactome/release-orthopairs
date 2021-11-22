@@ -23,7 +23,7 @@ import java.util.*;
 public class UniProtGeneNamesRetriever {
 
     private static final Logger logger = LogManager.getLogger();
-    private static final int MAX_UNIPROT_BATCH_QUERY_SIZE = 250;
+    private static final int MAX_UNIPROT_BATCH_QUERY_SIZE = 100;
 
     /**
      * Queries the UniProt mapping service through their Java API library. All Uniprot accession IDs are taken from the Panther
