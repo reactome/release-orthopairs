@@ -38,7 +38,7 @@ pipeline{
 			steps{
 				script{
 					sh "wget -q -O mmus_alternate_ids.txt http://www.informatics.jax.org/downloads/reports/HGNC_AllianceHomology.rpt"
-					sh "wget -q -O rnor_alternate_ids.txt ftp://ftp.rgd.mcw.edu/pub/data_release/GENES_RAT.txt"
+					sh "wget -q -O rnor_alternate_ids.txt https://download.rgd.mcw.edu/pub/data_release/GENES_RAT.txt"
 					sh "wget -q -O xtro_alternate_ids.txt ftp://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt"
 					sh "wget -q -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt"
 				}
