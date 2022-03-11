@@ -32,9 +32,9 @@ There are a few catches with using this new resource though -- Unlike Protein ID
 
 `Mouse Genome Informatics (MGI)` (<a href="http://www.informatics.jax.org/">link</a>) -- Mapping file: http://www.informatics.jax.org/downloads/reports/HGNC_homologene.rpt
 
-`Rat Genome Database (RGD)` (<a href="https://rgd.mcw.edu/">link</a>) -- Mapping file: ftp://ftp.rgd.mcw.edu/pub/data_release/GENES_RAT.txt
+`Rat Genome Database (RGD)` (<a href="https://rgd.mcw.edu/">link</a>) -- Mapping file: https://download.rgd.mcw.edu/data_release/GENES.RAT.txt
 
-`Xenbase (Frog)` (<a href="http://www.xenbase.org/entry/">link</a>) -- Mapping file: ftp://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt
+`Xenbase (Frog)` (<a href="http://www.xenbase.org/entry/">link</a>) -- Mapping file: https://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt
 
 `Zebrafish Information Network (ZFIN)` (<a href="https://zfin.org/">link</a>) Mapping file: https://zfin.org/downloads/ensembl_1_to_1.txt
 
