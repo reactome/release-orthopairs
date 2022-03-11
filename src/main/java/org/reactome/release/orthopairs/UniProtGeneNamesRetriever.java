@@ -23,7 +23,8 @@ import java.util.*;
 public class UniProtGeneNamesRetriever {
 
     private static final Logger logger = LogManager.getLogger();
-    private static final int MAX_UNIPROT_BATCH_QUERY_SIZE = 250;
+    private static final int MAX_NUMBER_OF_RETRIES = 5;
+    private static final int MAX_UNIPROT_BATCH_QUERY_SIZE = 100;
 
     /**
      * Queries the UniProt mapping service through their Java API library. All Uniprot accession IDs are taken from the Panther
@@ -134,7 +135,23 @@ public class UniProtGeneNamesRetriever {
             //System.out.println(uniprotAccessionsToGeneNames);
             Query query = UniProtQueryBuilder.accessions(uniprotIdentifierPartition);
             // Perform UniProt API query to retrieve gene names associated with identifiers.
-            QueryResult<UniProtComponent<Gene>> uniprotEntries = uniprotService.getGenes(query);
+
+            QueryResult<UniProtComponent<Gene>> uniprotEntries = null;
+            int currentQueryNum = 1;
+            while (currentQueryNum < MAX_NUMBER_OF_RETRIES && uniprotEntries == null) {
+                try {
+                    uniprotEntries = uniprotService.getGenes(query);
+                } catch (ServiceException e) {
+                    logger.error(e);
+                    currentQueryNum += 1;
+                    Thread.sleep(5000);
+                }
+            }
+
+            if (uniprotEntries == null) {
+                throw new RuntimeException("Unable to get Uniprot Entries after " + MAX_NUMBER_OF_RETRIES + " tries");
+            }
+
 
             //System.out.println("Number of hits: " + uniprotEntries.getNumberOfHits());
             QueryResultPage<UniProtComponent<Gene>> uniprotEntriesResultPage = uniprotEntries.getCurrentPage();
