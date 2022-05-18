@@ -73,7 +73,7 @@ pipeline{
 		            def currentDir = pwd()
 		            sh "mkdir -p ${previousReleaseVersion}/"
 		            sh "aws s3 --recursive --no-progress cp s3://reactome/private/releases/${previousReleaseVersion}/orthopairs/data/orthopairs/ ${previousReleaseVersion}/"
-		            sh "gunzip ${previousReleaseVersion}/*"
+		            sh "gunzip -q ${previousReleaseVersion}/*"
 		            utils.outputLineCountsOfFilesBetweenFolders("$releaseVersion", "$previousReleaseVersion", "$currentDir")
 		            sh "rm -r ${previousReleaseVersion}"
 		        }
