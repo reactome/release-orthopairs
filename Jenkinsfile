@@ -40,9 +40,19 @@ pipeline{
 					dir ('orthopairs') {
 						// The credentials used here are a config file uploaded to Jenkins.
 						withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
-							sh "java -jar target/orthopairs-${env.ORTHOPAIRS_VERSION}-jar-with-dependencies.jar $ConfigFile"
+							sh "java -jar target/orthopairs-jar-with-dependencies.jar $ConfigFile"
 						}
 					}
+				}
+			}
+		}
+
+		// This stage verifies orthopairs have correct size by comparing against the previous releases' files
+		stage('Post: Verify Orthopairs files have correct size') {
+			steps {
+				script {
+					def currentRelease = (pwd() =~ /Releases\/(\d+)\//)[0][1];
+					sh "java -jar target/orthopairs-verifier-jar-with-dependencies.jar -release $currentRelease"
 				}
 			}
 		}
