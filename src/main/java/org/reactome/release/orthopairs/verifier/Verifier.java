@@ -36,7 +36,7 @@ public class Verifier {
     private void run() throws IOException {
         Results results = compareCurrentAndPreviousOrthopairFiles();
 
-        results.report();
+        results.reportInfoMessages();
         if (results.hasErrors()) {
             results.reportErrors();
             System.exit(1);
