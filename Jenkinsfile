@@ -48,7 +48,7 @@ pipeline{
 		stage('Setup: Build jar file') {
 			steps {
 				script {
-					utils.buildJarFile()
+					utils.buildJarFileWithPackage()
 				}
 			}
 		}
