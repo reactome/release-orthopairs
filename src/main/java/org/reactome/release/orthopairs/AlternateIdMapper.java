@@ -102,7 +102,7 @@ public class AlternateIdMapper {
         return altIdToEnsemblMap;
     }
 
-    // This uses GenePageEnsemblModelMapping.txt from ftp://ftp.xenbase.org/pub/GenePageReports/
+    // This uses GenePageEnsemblModelMapping.txt from https://ftp.xenbase.org/pub/GenePageReports/
     private static Map<String,Set<String>> mapFrogAlternateIds(BufferedReader br) throws IOException {
         String line;
         Map<String, Set<String>> altIdToEnsemblMap = new HashMap<>();
