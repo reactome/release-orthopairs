@@ -28,7 +28,7 @@ pipeline{
 			steps {
 				script {
 					dir ('orthopairs') {
-							sh "mvn clean compile assembly:single"
+							sh "mvn clean package"
 					}
 				}
 			}
