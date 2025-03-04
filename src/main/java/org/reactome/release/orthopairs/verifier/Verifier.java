@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.reactome.release.verifier.CountUtils.greaterThanOrEqualTo5PercentDrop;
+import static org.reactome.release.verifier.CountUtils.greaterThanOrEqualToXPercentDrop;
 import static org.reactome.release.verifier.FileUtils.*;
 
 /**
@@ -49,7 +50,7 @@ public class Verifier {
         List<Path> previousOrthopairFilePaths = getPreviousOrthopairFilePaths();
         for (Path currentOrthopairFilePath : getCurrentOrthopairFilePaths()) {
             Path previousOrthopairFilePath =
-                getAnalgousPreviousOrthopairFile(currentOrthopairFilePath, previousOrthopairFilePaths);
+                getAnalogousPreviousOrthopairFile(currentOrthopairFilePath, previousOrthopairFilePaths);
 
             if (previousOrthopairFilePath != null) {
                 Results lineCountResults = checkLineCount(currentOrthopairFilePath, previousOrthopairFilePath);
@@ -81,7 +82,7 @@ public class Verifier {
         return Files.list(Paths.get(folderName)).filter(file -> file.getFileName().toString().endsWith(".tsv")).collect(Collectors.toList());
     }
 
-    private Path getAnalgousPreviousOrthopairFile(
+    private Path getAnalogousPreviousOrthopairFile(
         Path currentOrthopairFilePath, List<Path> previousOrthopairFilePaths) {
 
         return previousOrthopairFilePaths
@@ -102,17 +103,21 @@ public class Verifier {
         int currentLineCount = (int) Files.lines(currentOrthopairFilePath).count();
         int previousLineCount = (int) Files.lines(previousOrthopairFilePath).count();
 
-        if (greaterThanOrEqualTo5PercentDrop(currentLineCount, previousLineCount)) {
+        if (greaterThanOrEqualToXPercentDrop(currentLineCount, previousLineCount, 10)) {
             lineCountResults.addErrorMessage(
-                String.format("%s has significantly fewer lines than %s (%d vs. %d) - Difference: %d lines",
+                String.format("%s has significantly fewer lines than %s (%d vs. %d) - Difference: %d lines (%.2f%%)",
                     currentOrthopairFilePath, previousOrthopairFilePath, currentLineCount, previousLineCount,
-                    (previousLineCount - currentLineCount))
+                    (previousLineCount - currentLineCount),
+                    (float) (previousLineCount - currentLineCount) / previousLineCount
+                )
             );
         } else {
             lineCountResults.addInfoMessage(
-                String.format("%s (%d lines) vs. %s (%d lines) - Difference: %d lines",
+                String.format("%s (%d lines) vs. %s (%d lines) - Difference: %d lines (%.2f%%)",
                     currentOrthopairFilePath, currentLineCount, previousOrthopairFilePath, previousLineCount,
-                    (currentLineCount - previousLineCount))
+                    (currentLineCount - previousLineCount),
+                    (float) (previousLineCount - currentLineCount) / previousLineCount
+                )
             );
         }
 
@@ -126,17 +131,21 @@ public class Verifier {
         int currentFileSize = (int) Files.size(currentOrthopairFilePath);
         int previousFileSize = (int) Files.size(previousOrthopairFilePath);
 
-        if (greaterThanOrEqualTo5PercentDrop(currentFileSize, previousFileSize)) {
+        if (greaterThanOrEqualToXPercentDrop(currentFileSize, previousFileSize, 10)) {
             fileSizeResults.addErrorMessage(
-                String.format("%s has significantly smaller size than %s (%d bytes vs. %d bytes) - Difference: %d bytes",
+                String.format("%s has significantly smaller size than %s (%d bytes vs. %d bytes) - Difference: %d bytes (%.2f%%)",
                     currentOrthopairFilePath, previousOrthopairFilePath, currentFileSize, previousFileSize,
-                    (previousFileSize - currentFileSize))
+                    (previousFileSize - currentFileSize),
+                    (float) (previousFileSize - currentFileSize) / previousFileSize
+                )
             );
         } else {
             fileSizeResults.addInfoMessage(
-                String.format("%s (%d bytes) vs. %s (%d bytes) - Difference: %d bytes",
+                String.format("%s (%d bytes) vs. %s (%d bytes) - Difference: %d bytes (%.2f%%)",
                     currentOrthopairFilePath, currentFileSize, previousOrthopairFilePath, previousFileSize,
-                    (currentFileSize - previousFileSize))
+                    (currentFileSize - previousFileSize),
+                    (float) (currentFileSize - previousFileSize) / previousFileSize
+                )
             );
         }
 
