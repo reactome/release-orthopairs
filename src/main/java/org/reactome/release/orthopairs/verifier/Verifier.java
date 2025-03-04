@@ -108,7 +108,7 @@ public class Verifier {
                 String.format("%s has significantly fewer lines than %s (%d vs. %d) - Difference: %d lines (%.2f%%)",
                     currentOrthopairFilePath, previousOrthopairFilePath, currentLineCount, previousLineCount,
                     (previousLineCount - currentLineCount),
-                    (float) (previousLineCount - currentLineCount) / previousLineCount
+                    ((float) (previousLineCount - currentLineCount) / previousLineCount) * 100.0
                 )
             );
         } else {
@@ -116,7 +116,7 @@ public class Verifier {
                 String.format("%s (%d lines) vs. %s (%d lines) - Difference: %d lines (%.2f%%)",
                     currentOrthopairFilePath, currentLineCount, previousOrthopairFilePath, previousLineCount,
                     (currentLineCount - previousLineCount),
-                    (float) (previousLineCount - currentLineCount) / previousLineCount
+                    ((float) (previousLineCount - currentLineCount) / previousLineCount) * 100.0
                 )
             );
         }
@@ -136,7 +136,7 @@ public class Verifier {
                 String.format("%s has significantly smaller size than %s (%d bytes vs. %d bytes) - Difference: %d bytes (%.2f%%)",
                     currentOrthopairFilePath, previousOrthopairFilePath, currentFileSize, previousFileSize,
                     (previousFileSize - currentFileSize),
-                    (float) (previousFileSize - currentFileSize) / previousFileSize
+                    ((float) (previousFileSize - currentFileSize) / previousFileSize) * 100.0
                 )
             );
         } else {
@@ -144,7 +144,7 @@ public class Verifier {
                 String.format("%s (%d bytes) vs. %s (%d bytes) - Difference: %d bytes (%.2f%%)",
                     currentOrthopairFilePath, currentFileSize, previousOrthopairFilePath, previousFileSize,
                     (currentFileSize - previousFileSize),
-                    (float) (currentFileSize - previousFileSize) / previousFileSize
+                    ((float) (currentFileSize - previousFileSize) / previousFileSize) * 100.0
                 )
             );
         }
