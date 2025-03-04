@@ -70,7 +70,19 @@ pipeline{
 			steps {
 				script {
 					def currentRelease = (pwd() =~ /Releases\/(\d+)\//)[0][1];
-					sh "java -jar target/orthopairs-verifier-jar-with-dependencies.jar -release $currentRelease"
+					try {
+						sh "java -jar target/orthopairs-verifier-jar-with-dependencies.jar -release $currentRelease"
+					} catch (Exception e) {
+						def userInput = input(
+							id: 'userInput', message: "Orthopairs has errors - do you want to continue the orthopair pipeline",
+							parameters: [
+								[$class: 'BooleanParameterDefinition', defaultValue: true, name: 'response']
+							]
+						)
+						if (!userInput) {
+							error('Please manually address the orthopair error messages before continuing');
+						}
+					}
 				}
 			}
 		}
