@@ -61,8 +61,26 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.11.0</version>
+			<version>2.17.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.17.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jcommander</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.83</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.reactome.release.verifier</groupId>
+			<artifactId>verifier-lib</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 
 		<!-- Test dependencies -->
 		<dependency>
@@ -97,6 +115,18 @@
 	</dependencies>
 
 	<repositories>
+		<!-- Sonatype repository from which to obtain SNAPSHOT dependencies created by Reactome (or others sources) -->
+		<repository>
+			<id>oss.sonatype.org-snapshot</id>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+
 		<repository>
 			<id>nexus-ebi-repo</id>
 			<name>The EBI internal repository</name>
@@ -132,24 +162,46 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.2.0</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Multi-Release>true</Multi-Release>
-							<Main-Class>org.reactome.release.orthopairs.Main</Main-Class>
-						</manifestEntries>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<id>main-build</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Multi-Release>true</Multi-Release>
+									<Main-Class>org.reactome.release.orthopairs.Main</Main-Class>
+								</manifestEntries>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>orthopairs</finalName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>verifier-build</id> <!-- this is used for inheritance merges -->
 						<phase>package</phase> <!-- bind to the packaging phase -->
 						<goals>
 							<goal>single</goal>
 						</goals>
+
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Multi-Release>true</Multi-Release>
+									<Main-Class>org.reactome.release.orthopairs.verifier.Verifier</Main-Class>
+								</manifestEntries>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>orthopairs-verifier</finalName>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
