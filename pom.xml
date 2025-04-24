@@ -83,11 +83,7 @@
 			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
-			<artifactId>japi</artifactId>
-			<version>1.0.31</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest</artifactId>

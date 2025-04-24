@@ -10,7 +10,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import uk.ac.ebi.uniprot.dataservice.client.exception.ServiceException;
 
 public class Main
 {
@@ -34,7 +33,7 @@ public class Main
 
     private static final Logger logger = LogManager.getLogger();
 
-    public static void main( String[] args ) throws IOException, ParseException, ServiceException, InterruptedException {
+    public static void main( String[] args ) throws IOException, ParseException, InterruptedException {
 
         // If using an alternative source species, specify the 4-letter code as the second argument
         String pathToConfig = args.length > 0 ? args[0] : Paths.get("src", "main", "resources", "config.properties").toString();
