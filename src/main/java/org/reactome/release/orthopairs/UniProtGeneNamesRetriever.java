@@ -133,13 +133,11 @@ public class UniProtGeneNamesRetriever {
             }
 
             Map<String, String> results = fetchResults(jobId);
-            System.out.println("Results size: " + results.size());
             for (Map.Entry<String,String> result : results.entrySet()) {
                 String accession = result.getKey();
                 String geneName = result.getValue();
 
                 String uniprotAccessionToGeneName = accession + "\t" + geneName + "\n";
-                System.out.print(uniprotAccessionToGeneName);
                 uniprotAccessionsToGeneNames.add(uniprotAccessionToGeneName);
             }
         }
