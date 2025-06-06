@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import uk.ac.ebi.uniprot.dataservice.client.exception.ServiceException;
 
 public class Main
 {
@@ -33,7 +34,7 @@ public class Main
 
     private static final Logger logger = LogManager.getLogger();
 
-    public static void main( String[] args ) throws IOException, ParseException, InterruptedException {
+    public static void main( String[] args ) throws IOException, ParseException, InterruptedException, ServiceException {
 
         // If using an alternative source species, specify the 4-letter code as the second argument
         String pathToConfig = args.length > 0 ? args[0] : Paths.get("src", "main", "resources", "config.properties").toString();
@@ -86,7 +87,12 @@ public class Main
                 OrthopairFileGenerator.createSpeciesGeneProteinFile(speciesKey.toString(), targetGeneProteinMappingFilename, speciesJSON, speciesGeneProteinMap);
                 // Queries UniProt API for gene names and creates the {targetSpecies}_gene_name_mapping.tsv file
                 logger.info("Retrieving gene names for " + speciesNames.get(0) + " from UniProt");
-                UniProtGeneNamesRetriever.retrieveAndStoreGeneNameMappings(speciesKey.toString(), releaseNumber, sourceTargetProteinHomologs.get(speciesPantherName));
+                UniProtGeneNamesRetriever.RetrievalMethod retrievalMethod =
+                    speciesKey.equals("cfam") ?
+                    UniProtGeneNamesRetriever.RetrievalMethod.JAVA_API :
+                    UniProtGeneNamesRetriever.RetrievalMethod.REST_API;
+                UniProtGeneNamesRetriever.retrieveAndStoreGeneNameMappings(speciesKey.toString(), releaseNumber,
+                    sourceTargetProteinHomologs.get(speciesPantherName), retrievalMethod);
             }
         }
         logger.info("Finished Orthopairs file generation");
