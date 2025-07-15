@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
+DOWNLOADS_DIR = "downloads"
 
 DIR=$(dirname "$(readlink -f "$0")") # Directory of the script -- allows the script to invoked from anywhere
-cd $DIR
+mkdir -p $DIR/$DOWNLOADS_DIR
+cd $DIR/$DOWNLOADS_DIR
 
 ## Download files
 echo "Downloading ftp://ftp.pantherdb.org/ortholog/current_release/Orthologs_HCOP.tar.gz..."
@@ -27,10 +29,10 @@ wget -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt
 
 ## Update repo
 git pull
-## Create new jar file with orthopairs code
+## Create a new jar file with the orthopairs code
 mvn clean compile assembly:single
 
-## Ensures the correct jar file is obtained regardless of orthopairs project version
+## Ensures the correct jar file is obtained regardless of the orthopairs project version
 orthopairs_jar_file=$(ls target/orthopairs-*-jar-with-dependencies.jar)
 
 ## Run Orthopairs file generating script
