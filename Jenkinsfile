@@ -10,6 +10,12 @@ def utils = new Utilities()
 pipeline{
 	agent any
 
+        environment {
+		ECR_URL = 'public.ecr.aws/reactome/release-orthopairs'
+	        CONT_NAME = 'orthopairs_container'
+		DOWNLOAD_DIR = "downloads"
+        }
+	
 	stages{
 		// This stage checks that an upstream step, ConfirmReleaseConfigs, was run successfully.
 		stage('Check ConfirmReleaseConfigs build succeeded'){
@@ -23,13 +29,20 @@ pipeline{
 		stage('Setup: Download ortholog files from PANTHER'){
 			steps{
 				script{
-					def hcopFilename = "Orthologs_HCOP.tar.gz";
-					def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
-					def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
-					sh "wget -q ${pantherReleaseURL}/${hcopFilename}"
-					sh "tar -xvf ${hcopFilename}"
-					sh "wget -q ${pantherReleaseURL}/${qfoFilename}"
-					sh "tar -xvf ${qfoFilename}"
+					sh "mkdir -p $DOWNLOAD_DIR"
+					sh "rm -f $DOWNLOAD_DIR/*"
+					dir(DOWNLOAD_DIR) {
+					    def hcopFilename = "Orthologs_HCOP.tar.gz";
+					    def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
+					    def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
+					    sh '''
+	                                       set -e
+					       wget -q ${pantherReleaseURL}/${hcopFilename}
+					       tar -xvf ${hcopFilename}
+					       wget -q ${pantherReleaseURL}/${qfoFilename}
+					       tar -xvf ${qfoFilename}
+					    '''
+					}
 				}
 			}
 		}
@@ -37,34 +50,49 @@ pipeline{
 		stage('Setup: Download alternate ID mapping files from model organism databases'){
 			steps{
 				script{
-					sh "wget -q -O mmus_alternate_ids.txt http://www.informatics.jax.org/downloads/reports/HGNC_AllianceHomology.rpt"
-					sh "wget -q -O rnor_alternate_ids.txt https://download.rgd.mcw.edu/data_release/GENES_RAT.txt"
-					sh "wget -q -O xtro_alternate_ids.txt https://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt"
-					sh "wget -q -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt"
+				    dir(DOWNLOAD_DIR) {
+					sh '''
+                                            set -e
+                                            wget -q -O mmus_alternate_ids.txt http://www.informatics.jax.org/downloads/reports/HGNC_AllianceHomology.rpt
+					    wget -q -O rnor_alternate_ids.txt https://download.rgd.mcw.edu/data_release/GENES_RAT.txt
+					    wget -q -O xtro_alternate_ids.txt https://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt
+					    wget -q -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt
+					'''
+				    }
 				}
 			}
 		}	
-		// This stage builds the jar file using maven.
-		stage('Setup: Build jar file') {
-			steps {
-				script {
-					utils.buildJarFile()
-				}
-			}
-		}
+		steps{
+                    sh "docker pull ${ECR_URL}:latest"
+                    sh """
+                        if docker ps -a --format '{{.Names}}' | grep -Eq '${CONT_NAME}'; then
+                           docker rm -f ${CONT_NAME}
+                        fi
+                    """
+                }
 		// This stage executes the Orthopairs jar file, producing all Orthopairs files used by Orthoinference.
 		stage('Main: Generate Orthopairs files') {
 			steps {
+				def releaseVersion = utils.getReleaseVersion()
 				script {
 					// The credentials used here are a config file uploaded to Jenkins.
 					withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
-						sh "java -jar target/orthopairs-*-jar-with-dependencies.jar $ConfigFile"
+						sh """
+                                                   mkdir -p output
+					           rm -rf output/*
+                                                   docker run \\
+						       -v \$(pwd)/output:/output \\
+	                                               -v \$(pwd)/$DOWNLOAD_DIR:/downloads \\
+						       --name ${CONT_NAME} \\
+						       ${ECR_URL}:latest \\
+	                                               /bin/bash -c \'java -jar target/orthopairs-*-jar-with-dependencies.jar $ConfigFile && mv $releaseVersion output/\'
+						"""
 					}
 				}
 			}
 		}
 		// This stage compares the line counts of the orthopairs files generated between the current and previous release.
-		// An intelligible output should be visible at the console logs for the build.
+		// An intelligible output should be visible in the console logs for the build.
 		stage('Post: Orthopairs file line counts') {
 		    steps {
 		        script {
@@ -74,25 +102,25 @@ pipeline{
 		            sh "mkdir -p ${previousReleaseVersion}/"
 		            sh "aws s3 --recursive --no-progress cp s3://reactome/private/releases/${previousReleaseVersion}/orthopairs/data/orthopairs/ ${previousReleaseVersion}/"
 		            sh "gunzip -q ${previousReleaseVersion}/*"
-		            utils.outputLineCountsOfFilesBetweenFolders("$releaseVersion", "$previousReleaseVersion", "$currentDir")
+		            utils.outputLineCountsOfFilesBetweenFolders("output/$releaseVersion", "$previousReleaseVersion", "$currentDir")
 		            sh "rm -r ${previousReleaseVersion}"
 		        }
 		    }
 		}
 		// Logs and data files generated by this step are archived in the Reactome S3 bucket.
-		// All files are then deleted on server.
+		// All files are then deleted on the server.
 		stage('Post: Archive Outputs'){
 			steps{
 				script{
 					def releaseVersion = utils.getReleaseVersion()
 					sh "mkdir -p orthopairs/"
-					sh "mv ${releaseVersion}/* orthopairs/"
-					def dataFiles = ["orthopairs", "*alternate_ids.txt", "*.gz"]
+					sh "mv output/${releaseVersion}/* orthopairs/"
+					def dataFiles = ["orthopairs", "downloads/*alternate_ids.txt", "downloads/*.gz"]
 					// Log files are automatically output to a 'logs' folder, so nothing needs to be specified here.
 					def logFiles = []
 					def foldersToDelete = []
 					utils.cleanUpAndArchiveBuildFiles("orthopairs", dataFiles, logFiles, foldersToDelete)
-					sh "rm *Orthologs*"
+					sh "rm downloads/*Orthologs*"
 				}
 			}
 		}
