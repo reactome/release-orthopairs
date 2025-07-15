@@ -154,7 +154,7 @@
 		"group":"Vertebrate",
 		"compara":"core",
 		"panther_name":"XENTR",
-		"alt_id_file": "xtro_alternate_ids.txt"
+		"alt_id_file": "downloads/xtro_alternate_ids.txt"
 	},
 	"spom":{
 		"group":"Fungi/Plants",
@@ -220,7 +220,7 @@
 		"compara":"core",
 		"group":"Vertebrate",
 		"panther_name":"MOUSE",
-		"alt_id_file": "mmus_alternate_ids.txt"
+		"alt_id_file": "downloads/mmus_alternate_ids.txt"
 	},
 	"cfam":{
 		"compara":"core",
@@ -312,7 +312,7 @@
 		"group":"Vertebrate",
 		"compara":"core",
 		"panther_name":"DANRE",
-		"alt_id_file": "drer_alternate_ids.txt"
+		"alt_id_file": "downloads/drer_alternate_ids.txt"
 	},
 	"rnor":{
 		"compara":"core",
@@ -332,6 +332,6 @@
 			"Rattus norvegicus"
 		],
 		"panther_name":"RAT",
-		"alt_id_file":"rnor_alternate_ids.txt"
+		"alt_id_file":"downloads/rnor_alternate_ids.txt"
 	}
 }
