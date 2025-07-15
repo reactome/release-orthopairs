@@ -27,6 +27,8 @@ wget -O xtro_alternate_ids.txt https://ftp.xenbase.org/pub/GenePageReports/GeneP
 echo "Downloading https://zfin.org/downloads/ensembl_1_to_1.txt..."
 wget -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt
 
+cd $DIR
+
 ## Update repo
 git pull
 ## Create a new jar file with the orthopairs code
