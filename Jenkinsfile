@@ -77,8 +77,9 @@ pipeline{
 		// This stage executes the Orthopairs jar file, producing all Orthopairs files used by Orthoinference.
 		stage('Main: Generate Orthopairs files') {
 			steps {
-				def releaseVersion = utils.getReleaseVersion()
 				script {
+					def releaseVersion = utils.getReleaseVersion()
+
 					// The credentials used here are a config file uploaded to Jenkins.
 					withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
 						sh """
