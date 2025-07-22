@@ -31,7 +31,7 @@ pipeline{
 				script{
 					sh "mkdir -p $DOWNLOAD_DIR"
 					sh "rm -f $DOWNLOAD_DIR/*"
-					dir($DOWNLOAD_DIR) {
+					dir(DOWNLOAD_DIR) {
 					    def hcopFilename = "Orthologs_HCOP.tar.gz";
 					    def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
 					    def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
@@ -50,7 +50,7 @@ pipeline{
 		stage('Setup: Download alternate ID mapping files from model organism databases'){
 			steps{
 				script{
-				    dir($DOWNLOAD_DIR) {
+				    dir(DOWNLOAD_DIR) {
 					sh '''
                                             set -e
                                             wget -q -O mmus_alternate_ids.txt http://www.informatics.jax.org/downloads/reports/HGNC_AllianceHomology.rpt
