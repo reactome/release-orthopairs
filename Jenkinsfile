@@ -36,11 +36,11 @@ pipeline{
 					    def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
 					    def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
 					    sh '''
-	                                       set -e
-					       wget -q ${pantherReleaseURL}/${hcopFilename}
-					       tar -xvf ${hcopFilename}
-					       wget -q ${pantherReleaseURL}/${qfoFilename}
-					       tar -xvf ${qfoFilename}
+	                                       set -e;
+					       wget -q ${pantherReleaseURL}/${hcopFilename};
+					       tar -xvf ${hcopFilename};
+					       wget -q ${pantherReleaseURL}/${qfoFilename};
+					       tar -xvf ${qfoFilename};
 					    '''
 					}
 				}
