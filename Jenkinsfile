@@ -35,13 +35,13 @@ pipeline{
 					    def hcopFilename = "Orthologs_HCOP.tar.gz";
 					    def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
 					    def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
-					    sh '''
-	                                       set -e;
-					       wget -q ${pantherReleaseURL}/${hcopFilename};
-					       tar -xvf ${hcopFilename};
-					       wget -q ${pantherReleaseURL}/${qfoFilename};
-					       tar -xvf ${qfoFilename};
-					    '''
+					    sh """
+	                                       set -e
+					       wget -q ${pantherReleaseURL}/${hcopFilename}
+					       tar -xvf ${hcopFilename}
+					       wget -q ${pantherReleaseURL}/${qfoFilename}
+					       tar -xvf ${qfoFilename}
+					    """
 					}
 				}
 			}
@@ -51,13 +51,13 @@ pipeline{
 			steps{
 				script{
 				    dir(DOWNLOAD_DIR) {
-					sh '''
+					sh """
                                             set -e
                                             wget -q -O mmus_alternate_ids.txt http://www.informatics.jax.org/downloads/reports/HGNC_AllianceHomology.rpt
 					    wget -q -O rnor_alternate_ids.txt https://download.rgd.mcw.edu/data_release/GENES_RAT.txt
 					    wget -q -O xtro_alternate_ids.txt https://ftp.xenbase.org/pub/GenePageReports/GenePageEnsemblModelMapping.txt
 					    wget -q -O drer_alternate_ids.txt https://zfin.org/downloads/ensembl_1_to_1.txt
-					'''
+					"""
 				    }
 				}
 			}
