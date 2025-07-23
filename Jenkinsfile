@@ -83,14 +83,15 @@ pipeline{
 					// The credentials used here are a config file uploaded to Jenkins.
 					withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
 						sh """
-                                                   mkdir -p output
-					           rm -rf output/*
-                                                   docker run \\
-						       -v \$(pwd)/output:/output \\
-	                                               -v \$(pwd)/$DOWNLOAD_DIR:/downloads \\
-						       --name ${CONT_NAME} \\
-						       ${ECR_URL}:latest \\
-	                                               /bin/bash -c \'java -jar target/orthopairs-*-jar-with-dependencies.jar $ConfigFile && mv $releaseVersion output/\'
+      							mkdir -p output
+							rm -rf output/*
+							docker run \\
+							-v \$(pwd)/output:/output \\
+							-v \$(pwd)/$DOWNLOAD_DIR:/downloads \\
+							-v $ConfigFile:/tmp/config.properties
+							--name ${CONT_NAME} \\
+							${ECR_URL}:latest \\
+							/bin/bash -c \'java -jar target/orthopairs-*-jar-with-dependencies.jar /tmp/config.properties && mv $releaseVersion output/\'
 						"""
 					}
 				}
