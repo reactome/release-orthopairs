@@ -87,9 +87,9 @@ pipeline{
 							rm -rf output/*
 							docker run \\
 							-v \$(pwd)/output:/output \\
-							-v \$(pwd)/$DOWNLOAD_DIR:/downloads \\
+							-v \$(pwd)/$DOWNLOAD_DIR:/opt/release-orthopairs/downloads \\
 							-v $ConfigFile:/tmp/config.properties \\
-							-v \$(pwd)/src:/target/src \\
+							-v \$(pwd)/src/main/resources:/opt/release-orthopairs/src/main/resources \\
 							--name ${CONT_NAME} \\
 							${ECR_URL}:latest \\
 							/bin/bash -c \'java -jar target/orthopairs-*-jar-with-dependencies.jar /tmp/config.properties && mv $releaseVersion output/\'
