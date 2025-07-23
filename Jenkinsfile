@@ -89,6 +89,7 @@ pipeline{
 							-v \$(pwd)/output:/output \\
 							-v \$(pwd)/$DOWNLOAD_DIR:/downloads \\
 							-v $ConfigFile:/tmp/config.properties \\
+							-v \$(pwd)/src:/target/src \\
 							--name ${CONT_NAME} \\
 							${ECR_URL}:latest \\
 							/bin/bash -c \'java -jar target/orthopairs-*-jar-with-dependencies.jar /tmp/config.properties && mv $releaseVersion output/\'
