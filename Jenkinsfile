@@ -104,7 +104,7 @@ pipeline{
 		    steps {
 		        script {
 		            def releaseVersion = utils.getReleaseVersion()
-		            def previousReleaseVersion = utils.getPreviousReleaseVersion()
+		            def previousReleaseVersion = 92
 		            def currentDir = pwd()
 		            sh "mkdir -p ${previousReleaseVersion}/"
 		            sh "aws s3 --recursive --no-progress cp s3://reactome/private/releases/${previousReleaseVersion}/orthopairs/data/orthopairs/ ${previousReleaseVersion}/"
