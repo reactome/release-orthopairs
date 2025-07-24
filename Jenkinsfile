@@ -120,6 +120,8 @@ pipeline{
 			steps{
 				script{
 					def releaseVersion = utils.getReleaseVersion()
+
+					sh "sudo chown -R jenkins:jenkins output"
 					sh "mkdir -p orthopairs/"
 					sh "mv output/${releaseVersion}/* orthopairs/"
 					def dataFiles = ["orthopairs", "downloads/*alternate_ids.txt", "downloads/*.gz"]
