@@ -86,7 +86,7 @@ pipeline{
       							mkdir -p output
 							rm -rf output/*
 							docker run \\
-							-v \$(pwd)/output:/output \\
+							-v \$(pwd)/output:output \\
 							-v \$(pwd)/$DOWNLOAD_DIR:/opt/release-orthopairs/downloads \\
 							-v $ConfigFile:/tmp/config.properties \\
 							-v \$(pwd)/src/main/resources:/opt/release-orthopairs/src/main/resources \\
