@@ -86,7 +86,7 @@ pipeline{
       							mkdir -p output
 							rm -rf output/*
 							docker run \\
-							-v \$(pwd)/output:/output \\
+							-v \$(pwd)/output:/opt/release-orthopairs/output
 							-v \$(pwd)/$DOWNLOAD_DIR:/opt/release-orthopairs/downloads \\
 							-v $ConfigFile:/tmp/config.properties \\
 							-v \$(pwd)/src/main/resources:/opt/release-orthopairs/src/main/resources \\
@@ -120,6 +120,8 @@ pipeline{
 			steps{
 				script{
 					def releaseVersion = utils.getReleaseVersion()
+
+					sh "sudo chown -R jenkins:jenkins output"
 					sh "mkdir -p orthopairs/"
 					sh "mv output/${releaseVersion}/* orthopairs/"
 					def dataFiles = ["orthopairs", "downloads/*alternate_ids.txt", "downloads/*.gz"]
