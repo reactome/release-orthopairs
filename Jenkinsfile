@@ -83,15 +83,15 @@ pipeline{
 					// The credentials used here are a config file uploaded to Jenkins.
 					withCredentials([file(credentialsId: 'Config', variable: 'ConfigFile')]) {
 						sh """
-      							mkdir -p output
+							mkdir -p output
 							rm -rf output/*
-							docker run \\
-							-v \$(pwd)/output:/opt/release-orthopairs/output
-							-v \$(pwd)/$DOWNLOAD_DIR:/opt/release-orthopairs/downloads \\
-							-v $ConfigFile:/tmp/config.properties \\
-							-v \$(pwd)/src/main/resources:/opt/release-orthopairs/src/main/resources \\
-							--name ${CONT_NAME} \\
-							${ECR_URL}:latest \\
+							docker run \
+							-v \$(pwd)/output:/opt/release-orthopairs/output \
+							-v \$(pwd)/$DOWNLOAD_DIR:/opt/release-orthopairs/downloads \
+							-v $ConfigFile:/tmp/config.properties \
+							-v \$(pwd)/src/main/resources:/opt/release-orthopairs/src/main/resources \
+							--name ${CONT_NAME} \
+							${ECR_URL}:latest \
 							/bin/bash -c \'java -jar target/orthopairs-*-jar-with-dependencies.jar /tmp/config.properties && mv $releaseVersion output/\'
 						"""
 					}
