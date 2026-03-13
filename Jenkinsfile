@@ -34,7 +34,7 @@ pipeline{
 					dir(DOWNLOAD_DIR) {
 					    def hcopFilename = "Orthologs_HCOP.tar.gz";
 					    def qfoFilename = "QfO_Genome_Orthologs.tar.gz";
-					    def pantherReleaseURL = "ftp://ftp.pantherdb.org/ortholog/current_release"
+					    def pantherReleaseURL = "https://data.pantherdb.org/ftp/ortholog/current_release/"
 					    sh """
 	                                       set -e
 					       wget -q ${pantherReleaseURL}/${hcopFilename}
