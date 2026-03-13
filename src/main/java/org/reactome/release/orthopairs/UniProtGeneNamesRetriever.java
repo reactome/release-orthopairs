@@ -101,19 +101,21 @@ public class UniProtGeneNamesRetriever {
      * @return List<Set<String>> Partitioned UniProt identifiers.
      */
     public static List<Set<String>> partitionUniProtIdentifiers(Set<String> uniprotIds) {
+        System.out.println("Number of UniProtIds: " + uniprotIds.size());
         List<Set<String>> partitionedUniProtIds = new ArrayList<>();
         Set<String> partition = new HashSet<>();
         for (String uniprotId : uniprotIds) {
             // System.out.println(uniprotId);
             partition.add(uniprotId);
-            // Once the partition has 250 identifiers, add it to the List and reset the partition variable.
             if (partition.size() == MAX_UNIPROT_BATCH_QUERY_SIZE) {
                 partitionedUniProtIds.add(partition);
                 partition = new HashSet<>();
             }
         }
         // The final identifiers at the end are added to the List here.
-        partitionedUniProtIds.add(partition);
+        if (!partition.isEmpty()) {
+            partitionedUniProtIds.add(partition);
+        }
         return partitionedUniProtIds;
     }
 
