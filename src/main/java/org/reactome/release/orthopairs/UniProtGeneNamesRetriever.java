@@ -131,6 +131,7 @@ public class UniProtGeneNamesRetriever {
         uniprotService.start();
         Set<String> uniprotAccessionsToGeneNames = new HashSet<>();
         for (Set<String> uniprotIdentifierPartition : partitionedUniProtIds) {
+            System.out.println("UniProtIdentifierPartition: " + uniprotIdentifierPartition);
             // Build UniProt API query from Set of 250 UniProt identifiers.
             //System.out.println(uniprotAccessionsToGeneNames);
             Query query = UniProtQueryBuilder.accessions(uniprotIdentifierPartition);
